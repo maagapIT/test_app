@@ -2,16 +2,14 @@ name: PR Title Check
 
 on:
   pull_request:
-    types: [opened, edited]
+    types: [opened, edited, synchronize]
 
 jobs:
   check-title:
     runs-on: ubuntu-latest
     steps:
-      - name: Check PR Title
+      - name: Check PR body for required sections
+        if: github.event.pull_request.body == null || !contains(github.event.pull_request.body, '## Description')
         run: |
-          TITLE="${{ github.event.pull_request.title }}"
-          if [[ ! $TITLE =~ ^(feat|fix|docs|chore|refactor):\ .+ ]]; then
-            echo "❌ PR title must follow convention: 'feat|fix|docs|chore|refactor: description'"
-            exit 1
-          fi
+          echo "The pull request description is missing the '## Description' section."
+          exit 1
